@@ -1,4 +1,4 @@
-RSpec.describe "Admin V1 Categories", type: :request do
+RSpec.describe "Admin V1 Categories as Admin", type: :request do
   let(:user) { create(:user) }
   context "GET /categories" do
     let(:url) { "/admin/v1/categories" }
@@ -108,6 +108,31 @@ RSpec.describe "Admin V1 Categories", type: :request do
         expect(response).to have_http_status(:unprocessable_entity)
       end
 
+    end
+  end
+
+  context 'DELETE /categories' do
+    let!(:category) { create(:category) }
+    let(:url) {"/admin/v1/categories/#{category.id}"}
+
+    it 'removes Category' do
+      expect do  
+        delete url, headers: auth_header(user)
+      end.to change(Category, :count).by(-1)
+    end
+    it "returns success status" do
+      delete url, headers: auth_header(user)
+      expect(response).to have_http_status(:no_content)
+    end 
+    it 'does not return any body content' do
+      delete url, headers: auth_header(user)
+      expect(body_json).to_not be_present
+    end
+    it 'removed all associates products categories'do
+      products_categories = create_list(:product_category,3,category:category)
+      delete url, headers: auth_header(user)
+      expect_product_categories = ProductCategory.where(id: products_categories.map(&:id))
+      expect(expect_product_categories).to eq []
     end
   end
   
