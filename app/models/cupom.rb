@@ -1,4 +1,5 @@
 class Cupom < ApplicationRecord
+  include Paginatable
   validates :code,presence: true,uniqueness: {case_sensitive: false}
   validates :status,:due_date,:discount_value,presence: true
   validates :discount_value,numericality: {greater_than: 0}

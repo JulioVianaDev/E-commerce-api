@@ -1,4 +1,8 @@
 class Product < ApplicationRecord
+  
+  include NameSearchable
+  include Paginatable
+  
   belongs_to :productable, polymorphic: true
   validates :description, presence: true
   validates :price,presence: true,numericality: {greater_than: 0}
