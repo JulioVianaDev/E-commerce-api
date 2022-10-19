@@ -3,7 +3,7 @@ module Admin::V1
 
     before_action :load_category,only:[ :update,:destroy]
     def index
-      @categories = Category.all
+      @categories = load_categories
     end
 
     def create
@@ -30,6 +30,10 @@ module Admin::V1
       def category_params
         return {} unless params.has_key?(:category)
         params.require(:category).permit(:name) 
+      end
+      def load_categories
+        permitted = params.permit({search: :name},{order: {}}, :page, :length)
+        Admin::ModelLoadingService.new(Category.all,permitted).call
       end
       def save_category!
         @category.save!
